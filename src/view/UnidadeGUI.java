@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -98,6 +99,11 @@ public class UnidadeGUI extends javax.swing.JFrame {
         });
 
         jButton3.setText("Deletar");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Sair");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -127,6 +133,11 @@ public class UnidadeGUI extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(jTable1);
@@ -239,6 +250,31 @@ public class UnidadeGUI extends javax.swing.JFrame {
         carregarTabela();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+
+        int row = jTable1.rowAtPoint(evt.getPoint());
+        int col = jTable1.columnAtPoint(evt.getPoint());
+
+//        // Verifica se o clique ocorreu em uma célula válida
+//        if (row >= 0 && col >= 0) {
+//            // Obtém o valor da célula clicada
+//            Object cellValue = jTable1.getValueAt(row, col);
+//
+//            // Faça algo com o valor da célula (exemplo: exiba em uma caixa de diálogo)
+////            JOptionPane.showMessageDialog(null, "Valor da célula: " + cellValue);
+//        }
+        if (row >= 0) {
+
+            txtCodigo.setText("" + jTable1.getValueAt(row, 0));
+            txtNome.setText("" + jTable1.getValueAt(row, 1));
+            txtSigla.setText("" + jTable1.getValueAt(row, 2));
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        deletarUnidade();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -275,23 +311,33 @@ public class UnidadeGUI extends javax.swing.JFrame {
     }
 
     public void adicionarUnidade() throws SQLException {
-        String nome = txtNome.getText();
-        String simbolo = txtSigla.getText();
+        int id = Integer.parseInt(txtCodigo.getText());
+        String nome = txtNome.getText().toUpperCase();
+        String simbolo = txtSigla.getText().toUpperCase();
+        if (nome.length() > 1 && simbolo.length() > 1) {
 
-        try (Connection conexao = ConexaoMySQL.obterConexao()) {
-            UnidadeService unidadeService = new UnidadeService(conexao);
-            unidadeService.adicionarUnidade(new Unidade(nome, simbolo));
-            limparUnidade();
-            carregarTabela();
-        } catch (SQLException e) {
-            System.out.println("ERRO: " + e);
-            e.printStackTrace();
+            try (Connection conexao = ConexaoMySQL.obterConexao()) {
+                UnidadeService unidadeService = new UnidadeService(conexao);
+
+                if (id == 0) {
+                    unidadeService.adicionarUnidade(new Unidade(nome, simbolo));
+                } else {
+                    unidadeService.atualizarUnidade(new Unidade(id, nome, simbolo));
+                }
+                limparUnidade();
+                carregarTabela();
+            } catch (SQLException e) {
+                System.out.println("ERRO: " + e);
+                e.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Não deixe campos em branco!", "Alerta", JOptionPane.WARNING_MESSAGE);
         }
 
     }
 
     public void limparUnidade() {
-        txtCodigo.setText("");
+        txtCodigo.setText("0");
         txtNome.setText("");
         txtSigla.setText("");
         txtNome.requestFocus();
@@ -306,12 +352,30 @@ public class UnidadeGUI extends javax.swing.JFrame {
             List<Unidade> unidades = unidadeService.listarUnidades(); // Chame o seu serviço para obter os dados
             model.setRowCount(0); // Remove todas as linhas existentes do modelo de tabela
             for (Unidade unidade : unidades) {
-                model.addRow(new Object[]{unidade.getCodigo(), unidade.getNome(), unidade.getSimbolo(),true});
+                model.addRow(new Object[]{unidade.getCodigo(), unidade.getNome(), unidade.getSimbolo(), true});
             }
             jTable1.getTableHeader().setReorderingAllowed(false);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         } catch (SQLException e) {
+            System.out.println("ERRO: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    public void deletarUnidade() {
+
+        try (Connection conexao = ConexaoMySQL.obterConexao()) {
+            int codigo = Integer.parseInt(txtCodigo.getText());
+            if (codigo != 0) {
+                UnidadeService unidadeService = new UnidadeService(conexao);
+                unidadeService.deletarUnidade(codigo);
+                carregarTabela();
+            }
+            limparUnidade();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(rootPane, "Em uso!", "Cuidado", JOptionPane.ERROR_MESSAGE);
+
             System.out.println("ERRO: " + e);
             e.printStackTrace();
         }
