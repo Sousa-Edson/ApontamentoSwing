@@ -1,7 +1,5 @@
 package view;
 
-import view.HomeGUI;
-
 import conexao.ConexaoMySQL;
 import model.Unidade;
 import services.UnidadeService;
@@ -12,12 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 public class UnidadeGUI extends javax.swing.JFrame {
 
@@ -369,6 +363,9 @@ public class UnidadeGUI extends javax.swing.JFrame {
             if (codigo != 0) {
                 UnidadeService unidadeService = new UnidadeService(conexao);
                 unidadeService.deletarUnidade(codigo);
+                JOptionPane.showMessageDialog(rootPane, "Deletado com sucesso!", "Sucesso", 
+                        JOptionPane.INFORMATION_MESSAGE);
+
                 carregarTabela();
             }
             limparUnidade();

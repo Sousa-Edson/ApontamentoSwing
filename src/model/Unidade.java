@@ -4,12 +4,11 @@
  */
 package model;
 
- 
 public class Unidade {
+
     int codigo;
     String nome;
     String simbolo;
-
 
     public Unidade() {
     }
@@ -51,10 +50,6 @@ public class Unidade {
 
     @Override
     public String toString() {
-        return "Unidade{" +
-                "codigo=" + codigo +
-                ", nome='" + nome + '\'' +
-                ", simbolo='" + simbolo + '\'' +
-                '}';
+        return simbolo;
     }
 }
