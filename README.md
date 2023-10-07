@@ -41,17 +41,17 @@ Se você deseja contribuir para este projeto ou tem sugestões para melhorias, s
 
 ## Imagens
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema1.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema1.png)
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema2.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema2.png)
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema3.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema3.png)
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema4.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema4.png)
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema5.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema5.png)
 
-![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema6.png)
+![Texto Alternativo](https://github.com/Sousa-Edson/apontamentoSwing/blob/main/src/img/sistema6.png)
 
 
 
