@@ -38,4 +38,20 @@ Se você deseja contribuir para este projeto ou tem sugestões para melhorias, s
 1. Clone este repositório para o seu ambiente local.
 2. Abra o projeto no NetBeans IDE.
 3. Compile e execute o aplicativo para iniciar a interface de "Apontamento Swing".
- 
+
+## Imagens
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema1.png)
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema2.png)
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema3.png)
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema4.png)
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema5.png)
+
+![Texto Alternativo](/home/edson/Projetos/desktop/apontamentoSwing/src/img/sistema6.png)
+
+
+
