@@ -92,6 +92,26 @@ public class ProdutoDAO {
         }
     }
 
+    // Método para encontrar produtos pelo nome
+    public List<Produto> encontrarProdutosPorNome(String nome) throws SQLException {
+        List<Produto> produtos = new ArrayList<>();
+        String sql = "SELECT p.*, u.nome AS nome_unidade, u.sigla AS sigla_unidade FROM produtos p "
+                + "INNER JOIN unidades u ON p.unidade_id = u.codigo "
+                + "WHERE p.nome LIKE ?"; // Usamos LIKE para fazer a pesquisa por parte do nome
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            // Defina o valor do parâmetro nome usando um padrão com "%" para corresponder a qualquer parte do nome
+            stmt.setString(1, "%" + nome + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                produtos.add(new Produto(rs.getInt("codigo"), rs.getString("nome"),
+                        new Unidade(rs.getInt("unidade_id"), rs.getString("nome_unidade"), rs.getString("sigla_unidade"))));
+            }
+        }
+        return produtos;
+    }
+
     // Método para atualizar um produto no banco de dados
     public void atualizarProduto(Produto produto) throws SQLException {
         String sql = "UPDATE produtos SET nome = ?, unidade_id = ? WHERE codigo = ?";

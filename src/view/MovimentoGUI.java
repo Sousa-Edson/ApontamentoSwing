@@ -1,9 +1,11 @@
 package view;
 
 import conexao.ConexaoMySQL;
+import enums.TipoMovimento;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +51,6 @@ public class MovimentoGUI extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtCodigo = new javax.swing.JTextField();
-        txtNome = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         lblCbProduto = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -64,6 +65,9 @@ public class MovimentoGUI extends javax.swing.JFrame {
         lblTxtProduto = new javax.swing.JLabel();
         btnBuscar = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
+        spQuantidade = new javax.swing.JSpinner();
+        jLabel4 = new javax.swing.JLabel();
+        cbTipo = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -160,6 +164,18 @@ public class MovimentoGUI extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(3).setResizable(false);
         }
 
+        cbProduto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                cbProdutoKeyPressed(evt);
+            }
+        });
+
+        txtBusca.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscaKeyPressed(evt);
+            }
+        });
+
         lblTxtProduto.setText("PRODUTO: ");
 
         btnBuscar.setText("Buscar");
@@ -176,6 +192,10 @@ public class MovimentoGUI extends javax.swing.JFrame {
             }
         });
 
+        spQuantidade.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+
+        jLabel4.setText("TIPO: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -186,38 +206,39 @@ public class MovimentoGUI extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(46, 46, 46)
+                                .addGap(27, 27, 27)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel3)
                                     .addComponent(lblCbProduto)
-                                    .addComponent(lblTxtProduto))
+                                    .addComponent(lblTxtProduto)
+                                    .addComponent(jLabel5))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cbProduto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(txtBusca))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbTipo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(txtBusca)
+                                    .addComponent(cbProduto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(btnBuscar)
                                     .addComponent(btnLimpar))
                                 .addGap(26, 26, 26))
                             .addGroup(layout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addComponent(jButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel5)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtNome)
-                                        .addGap(194, 194, 194))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(23, 23, 23)
-                                        .addComponent(jButton1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton3)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton4)))))
+                                .addComponent(jButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton4)))
                         .addGap(67, 67, 67))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(50, 50, 50)
@@ -244,7 +265,9 @@ public class MovimentoGUI extends javax.swing.JFrame {
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCbProduto)
@@ -257,8 +280,8 @@ public class MovimentoGUI extends javax.swing.JFrame {
                     .addComponent(btnBuscar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(spQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
@@ -281,9 +304,12 @@ public class MovimentoGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-//        carregarProdutos("");
-//        carregarTabela();
-//        limparProduto();
+        carregarProdutos("");
+        carregarTabela();
+        limparProduto();
+        mostraCampos();
+        
+        carregarTipo();
 
         carregarProdutos(cbProduto.getSelectedItem().toString());
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -303,7 +329,7 @@ public class MovimentoGUI extends javax.swing.JFrame {
         if (row >= 0) {
 
             txtCodigo.setText("" + jTable1.getValueAt(row, 0));
-            txtNome.setText("" + jTable1.getValueAt(row, 1));
+//            txtNome.setText("" + jTable1.getValueAt(row, 1));
             carregarProdutos("" + jTable1.getValueAt(row, 2));
         }
     }//GEN-LAST:event_jTable1MouseClicked
@@ -313,17 +339,28 @@ public class MovimentoGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
-        cbProduto.setVisible(false);
-        lblCbProduto.setVisible(false);
-        btnLimpar.setVisible(false);
-
-        txtBusca.setVisible(!false);
-        lblTxtProduto.setVisible(!false);
-        btnBuscar.setVisible(!false);
-        txtBusca.requestFocus();
+        mostraCampos();
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        escondecampos();
+        encontrarProdutos(txtBusca.getText());
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void txtBuscaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscaKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            // Ação a ser executada quando a tecla Enter é pressionada
+            escondecampos();
+            encontrarProdutos(txtBusca.getText());
+        }
+    }//GEN-LAST:event_txtBuscaKeyPressed
+
+    private void cbProdutoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cbProdutoKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            mostraCampos();
+        }
+    }//GEN-LAST:event_cbProdutoKeyPressed
+    public void escondecampos() {
         cbProduto.setVisible(!false);
         lblCbProduto.setVisible(!false);
         btnLimpar.setVisible(!false);
@@ -331,7 +368,19 @@ public class MovimentoGUI extends javax.swing.JFrame {
         txtBusca.setVisible(false);
         lblTxtProduto.setVisible(false);
         btnBuscar.setVisible(false);
-    }//GEN-LAST:event_btnBuscarActionPerformed
+    }
+
+    public void mostraCampos() {
+        cbProduto.setVisible(false);
+        lblCbProduto.setVisible(false);
+        btnLimpar.setVisible(false);
+
+        txtBusca.setVisible(!false);
+        lblTxtProduto.setVisible(!false);
+        btnBuscar.setVisible(!false);
+        txtBusca.setText("");
+        txtBusca.requestFocus();
+    }
 
     /**
      * @param args the command line arguments
@@ -377,7 +426,8 @@ public class MovimentoGUI extends javax.swing.JFrame {
 
     public void adicionarProduto() throws SQLException {
         int id = Integer.parseInt(txtCodigo.getText());
-        String nome = txtNome.getText().toUpperCase();
+        String nome ="";
+//                txtNome.getText().toUpperCase();
         Unidade unidade = (Unidade) cbProduto.getSelectedItem();
         if (nome.length() > 1) {
             try (Connection conexao = ConexaoMySQL.obterConexao()) {
@@ -402,8 +452,8 @@ public class MovimentoGUI extends javax.swing.JFrame {
 
     public void limparProduto() {
         txtCodigo.setText("0");
-        txtNome.setText("");
-        txtNome.requestFocus();
+//        txtNome.setText("");
+//        txtNome.requestFocus();
     }
 
     public void carregarProdutos(String p) {
@@ -415,6 +465,23 @@ public class MovimentoGUI extends javax.swing.JFrame {
                 if (produto.getNome().contains(p)) {
                     cbProduto.setSelectedItem(produto);
                 }
+            }
+        } catch (SQLException e) {
+            System.out.println("ERRO: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    public void encontrarProdutos(String p) {
+        try (Connection conexao = ConexaoMySQL.obterConexao()) {
+            ProdutoService produtoService = new ProdutoService(conexao);
+            cbProduto.removeAllItems();
+            for (Produto produto : produtoService.encontrarProdutosPorNome(p)) {
+                cbProduto.addItem(produto);
+//                if (produto.getNome().contains(p)) {
+//                    cbProduto.setSelectedItem(produto);
+//                    System.out.println("view.MovimentoGUI.carregarProdutos()" + produto);
+//                }
             }
         } catch (SQLException e) {
             System.out.println("ERRO: " + e);
@@ -460,11 +527,24 @@ public class MovimentoGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+    
+    
+    
+    
+    public void carregarTipo() {
+         
+           // Adicione os valores do enum ao modelo de combobox
+        Arrays.stream(TipoMovimento.values()).forEach(cbTipo::addItem);
+        
+    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JComboBox<Produto> cbProduto;
+    private javax.swing.JComboBox<TipoMovimento> cbTipo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -472,14 +552,16 @@ public class MovimentoGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblCbProduto;
     private javax.swing.JLabel lblTxtProduto;
+    private javax.swing.JSpinner spQuantidade;
     private javax.swing.JTextField txtBusca;
     private javax.swing.JTextField txtCodigo;
-    private javax.swing.JTextField txtNome;
     // End of variables declaration//GEN-END:variables
+
 }

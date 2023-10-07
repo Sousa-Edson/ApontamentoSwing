@@ -36,6 +36,10 @@ public class ProdutoService {
     public Produto encontrarProdutoPorCodigo(int codigo) throws SQLException {
         return produtoDAO.encontrarProdutoPorCodigo(codigo);
     }
+    
+     public List<Produto> encontrarProdutosPorNome(String nome) throws SQLException {
+        return produtoDAO.encontrarProdutosPorNome(nome);
+    }
 
     public void atualizarProduto(Produto produto) throws SQLException {
         produtoDAO.atualizarProduto(produto);
