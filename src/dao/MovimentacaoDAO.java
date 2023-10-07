@@ -87,10 +87,12 @@ public class MovimentacaoDAO {
 
     // Método para encontrar uma movimentação pelo seu código
     public Movimentacao encontrarMovimentacaoPorCodigo(int codigo) throws SQLException {
-        String sql = "SELECT m.*, p.nome AS nome_produto, p.unidade_id, p.codigo AS codigo_produto "
+        String sql = "SELECT m.*, p.nome AS nome_produto, p.unidade_id, p.codigo AS codigo_produto,"
+                + " u.nome AS nome_unidade, u.sigla AS sigla_unidade "
                 + "FROM movimentacoes m "
                 + "INNER JOIN produtos p ON m.produto_id = p.codigo "
-                + "WHERE m.codigo = ?";
+                + "INNER JOIN unidades u ON p.unidade_id = u.codigo "
+                + "WHERE p.codigo = ?";
 
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setInt(1, codigo);
@@ -104,8 +106,13 @@ public class MovimentacaoDAO {
                     Produto produto = new Produto();
                     produto.setCodigo(rs.getInt("codigo_produto"));
                     produto.setNome(rs.getString("nome_produto"));
-                    // Configurar a unidade do produto, se necessário
-                    // produto.setUnidade(unidade);
+
+                    Unidade unidade = new Unidade();
+                    unidade.setCodigo(rs.getInt("unidade_id"));
+                    unidade.setNome(rs.getString("nome_unidade"));
+                    unidade.setSimbolo(rs.getString("sigla_unidade"));
+
+                    produto.setUnidade(unidade);
 
                     movimentacao.setProduto(produto);
                     movimentacao.setQuantidade(rs.getInt("quantidade"));
@@ -140,5 +147,32 @@ public class MovimentacaoDAO {
             stmt.setInt(1, codigo);
             stmt.executeUpdate();
         }
+    }
+
+    // Método para listar todas as movimentações do banco de dados sse um produto especifico
+    public List<Movimentacao> listarMovimentacoesPorProdutos(int codigo) throws SQLException {
+        List<Movimentacao> movimentacoes = new ArrayList<>();
+        String sql = "SELECT m.codigo, tipo_movimento, produto_id, quantidade FROM movimentacoes  as m"
+                + " INNER JOIN produtos p ON m.produto_id = p.codigo "
+                + " WHERE p.codigo = ? ";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setInt(1, codigo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                
+              while (rs.next()) {
+
+                    Movimentacao movimentacao = new Movimentacao();
+                    movimentacao.setCodigo(rs.getInt("m.codigo"));
+                    movimentacao.setTipoMovimento(TipoMovimento.valueOf(rs.getString("tipo_movimento")));
+
+                    movimentacao.setQuantidade(rs.getInt("quantidade"));
+                    System.out.println("1");
+                    movimentacoes.add(movimentacao);
+                
+                }
+            }
+        }
+         return movimentacoes;
     }
 }
