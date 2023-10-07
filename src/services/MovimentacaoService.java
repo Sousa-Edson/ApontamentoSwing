@@ -31,7 +31,7 @@ public class MovimentacaoService {
         return movimentacaoDAO.listarMovimentacoes();
     }
 
-    public Movimentacao encontrarMovimentacaoPorCodigo(int codigo) throws SQLException {
+    public Movimentacao encontrarMovimentacaoProdutoPorCodigo(int codigo) throws SQLException {
         return movimentacaoDAO.encontrarMovimentacaoPorCodigo(codigo);
     }
 
@@ -41,5 +41,9 @@ public class MovimentacaoService {
 
     public void deletarMovimentacaoPorCodigo(int codigo) throws SQLException {
         movimentacaoDAO.deletarMovimentacaoPorCodigo(codigo);
+    }
+
+    public List<Movimentacao> listarMovimentacoesPorProdutos(int id) throws SQLException {
+        return movimentacaoDAO.listarMovimentacoesPorProdutos(id);
     }
 }
