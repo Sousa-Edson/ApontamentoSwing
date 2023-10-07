@@ -13,8 +13,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import model.Movimentacao;
 import model.Produto;
 import model.Unidade;
+import services.MovimentacaoService;
 import services.ProdutoService;
 import services.UnidadeService;
 
@@ -36,6 +38,9 @@ public class MovimentoGUI extends javax.swing.JFrame {
         cbProduto.setVisible(false);
         lblCbProduto.setVisible(false);
         btnLimpar.setVisible(false);
+        
+        carregarTipo();
+        carregarTabela();
     }
 
     /**
@@ -133,19 +138,12 @@ public class MovimentoGUI extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Id", "Descrição", "Unidade", "Ativo"
+                "Id", "Tipo", "Descrição", "Unidade", "Quantidade"
             }
         ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
-            };
             boolean[] canEdit = new boolean [] {
-                false, false, false, true
+                false, false, false, false, false
             };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -162,6 +160,7 @@ public class MovimentoGUI extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(1).setResizable(false);
             jTable1.getColumnModel().getColumn(2).setResizable(false);
             jTable1.getColumnModel().getColumn(3).setResizable(false);
+            jTable1.getColumnModel().getColumn(4).setResizable(false);
         }
 
         cbProduto.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -308,31 +307,26 @@ public class MovimentoGUI extends javax.swing.JFrame {
         carregarTabela();
         limparProduto();
         mostraCampos();
-
+        
         carregarTipo();
-
+        
         carregarProdutos(cbProduto.getSelectedItem().toString());
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-//        try {
-//            adicionarProduto();
-//        } catch (SQLException ex) {
-//            Logger.getLogger(UnidadeGUI.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        System.out.println("Tipo: " + cbTipo.getSelectedItem());
-        System.out.println("Produto: " + cbProduto.getSelectedItem());
-        System.out.println("Quantidade: " + spQuantidade.getValue());
-
-
+        try {
+            adicionarProduto();
+        } catch (SQLException ex) {
+            Logger.getLogger(UnidadeGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-
+        
         int row = jTable1.rowAtPoint(evt.getPoint());
         int col = jTable1.columnAtPoint(evt.getPoint());
         if (row >= 0) {
-
+            
             txtCodigo.setText("" + jTable1.getValueAt(row, 0));
 //            txtNome.setText("" + jTable1.getValueAt(row, 1));
             carregarProdutos("" + jTable1.getValueAt(row, 2));
@@ -348,15 +342,21 @@ public class MovimentoGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        escondecampos();
         encontrarProdutos(txtBusca.getText());
+        txtBusca.requestFocus();
+        if (cbProduto.getSelectedObjects().length != 0) {
+            escondecampos();
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void txtBuscaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscaKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             // Ação a ser executada quando a tecla Enter é pressionada
-            escondecampos();
             encontrarProdutos(txtBusca.getText());
+            txtBusca.requestFocus();
+            if (cbProduto.getSelectedObjects().length != 0) {
+                escondecampos();
+            }
         }
     }//GEN-LAST:event_txtBuscaKeyPressed
 
@@ -369,17 +369,17 @@ public class MovimentoGUI extends javax.swing.JFrame {
         cbProduto.setVisible(!false);
         lblCbProduto.setVisible(!false);
         btnLimpar.setVisible(!false);
-
+        
         txtBusca.setVisible(false);
         lblTxtProduto.setVisible(false);
         btnBuscar.setVisible(false);
     }
-
+    
     public void mostraCampos() {
         cbProduto.setVisible(false);
         lblCbProduto.setVisible(false);
         btnLimpar.setVisible(false);
-
+        
         txtBusca.setVisible(!false);
         lblTxtProduto.setVisible(!false);
         btnBuscar.setVisible(!false);
@@ -428,21 +428,24 @@ public class MovimentoGUI extends javax.swing.JFrame {
             }
         });
     }
-
+    
     public void adicionarProduto() throws SQLException {
+        int quantidade = (int) spQuantidade.getValue();
         int id = Integer.parseInt(txtCodigo.getText());
         String nome = "";
 //                txtNome.getText().toUpperCase();
-        Unidade unidade = (Unidade) cbProduto.getSelectedItem();
-        if (nome.length() > 1) {
+        Produto produto = (Produto) cbProduto.getSelectedItem();
+        TipoMovimento tipoMovimento = (TipoMovimento) cbTipo.getSelectedItem();
+        if (quantidade >= 1) {
             try (Connection conexao = ConexaoMySQL.obterConexao()) {
-                ProdutoService produtoService = new ProdutoService(conexao);
-
+                MovimentacaoService movimentacaoService = new MovimentacaoService(conexao);
+                
                 if (id == 0) {
-                    produtoService.adicionarProduto(new Produto(nome, unidade));
-                } else {
-                    produtoService.atualizarProduto(new Produto(id, nome, unidade));
+                    movimentacaoService.adicionarMovimentacao(new Movimentacao(tipoMovimento, produto, quantidade));
                 }
+//                else {
+//                   movimentacaoService.atualizarMovimentacao(new Movimentacao());
+//                }
                 limparProduto();
                 carregarTabela();
             } catch (SQLException e) {
@@ -452,15 +455,15 @@ public class MovimentoGUI extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(rootPane, "Não deixe campos em branco!", "Alerta", JOptionPane.WARNING_MESSAGE);
         }
-
+        
     }
-
+    
     public void limparProduto() {
         txtCodigo.setText("0");
-//        txtNome.setText("");
-//        txtNome.requestFocus();
+        mostraCampos();
+        spQuantidade.setValue(0);
     }
-
+    
     public void carregarProdutos(String p) {
         try (Connection conexao = ConexaoMySQL.obterConexao()) {
             ProdutoService produtoService = new ProdutoService(conexao);
@@ -476,34 +479,31 @@ public class MovimentoGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-
+    
     public void encontrarProdutos(String p) {
         try (Connection conexao = ConexaoMySQL.obterConexao()) {
             ProdutoService produtoService = new ProdutoService(conexao);
             cbProduto.removeAllItems();
             for (Produto produto : produtoService.encontrarProdutosPorNome(p)) {
                 cbProduto.addItem(produto);
-//                if (produto.getNome().contains(p)) {
-//                    cbProduto.setSelectedItem(produto);
-//                    System.out.println("view.MovimentoGUI.carregarProdutos()" + produto);
-//                }
             }
         } catch (SQLException e) {
             System.out.println("ERRO: " + e);
             e.printStackTrace();
         }
     }
-
+    
     public void carregarTabela() {
-
+        
         try (Connection conexao = ConexaoMySQL.obterConexao()) {
-            ProdutoService produtoService = new ProdutoService(conexao);
-
+            MovimentacaoService movimentacaoService = new MovimentacaoService(conexao);
+            
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel(); // jTable1 é o nome da sua tabela
-            List<Produto> produtos = produtoService.listarProdutos(); // Chame o seu serviço para obter os dados
+            List<Movimentacao> movimentos = movimentacaoService.listarMovimentacoes(); // Chame o seu serviço para obter os dados
             model.setRowCount(0); // Remove todas as linhas existentes do modelo de tabela
-            for (Produto produto : produtos) {
-                model.addRow(new Object[]{produto.getCodigo(), produto.getNome(), produto.getUnidade().getSimbolo(), true});
+            for (Movimentacao movimentacao : movimentos) {
+                model.addRow(new Object[]{movimentacao.getCodigo(),movimentacao.getTipoMovimento(), movimentacao.getProduto().getNome(),
+                    movimentacao.getProduto().getUnidade().getSimbolo(), movimentacao.getQuantidade()});
             }
             jTable1.getTableHeader().setReorderingAllowed(false);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -512,32 +512,32 @@ public class MovimentoGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-
+    
     public void deletarProduto() {
         try (Connection conexao = ConexaoMySQL.obterConexao()) {
             int codigo = Integer.parseInt(txtCodigo.getText());
             if (codigo != 0) {
-                ProdutoService produtoService = new ProdutoService(conexao);
-                produtoService.deletarProdutoPorCodigo(codigo);
+                MovimentacaoService movimentacaoService = new MovimentacaoService(conexao);
+                movimentacaoService.deletarMovimentacaoPorCodigo(codigo);
                 JOptionPane.showMessageDialog(rootPane, "Deletado com sucesso!", "Sucesso",
                         JOptionPane.INFORMATION_MESSAGE);
                 carregarTabela();
             }
             limparProduto();
-
+            
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(rootPane, "Em uso!", "Cuidado", JOptionPane.ERROR_MESSAGE);
-
+            
             System.out.println("ERRO: " + e);
             e.printStackTrace();
         }
     }
-
+    
     public void carregarTipo() {
 
         // Adicione os valores do enum ao modelo de combobox
         Arrays.stream(TipoMovimento.values()).forEach(cbTipo::addItem);
-
+        
     }
 
 
