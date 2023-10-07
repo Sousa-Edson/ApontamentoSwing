@@ -1,18 +1,18 @@
 package view;
 
 import conexao.ConexaoMySQL;
+import enums.TipoMovimento;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import model.Movimentacao;
 import model.Produto;
-import model.Unidade;
+import services.MovimentacaoService;
 import services.ProdutoService;
-import services.UnidadeService;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -24,11 +24,11 @@ import services.UnidadeService;
  */
 public class BuscarGUI extends javax.swing.JFrame {
 
-    /**
-     * Creates new form UnidadeGUI
-     */
+    int saldo = 0, qEntrada = 0, qSaida = 0;
+
     public BuscarGUI() {
         initComponents();
+        carregarTabela();
     }
 
     /**
@@ -69,7 +69,13 @@ public class BuscarGUI extends javax.swing.JFrame {
         jLabel1.setText("APONTAMENTO SWING");
 
         jLabel2.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
-        jLabel2.setText("MOVIMENTOS");
+        jLabel2.setText("SALDOS");
+
+        txtNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtNomeKeyPressed(evt);
+            }
+        });
 
         jLabel5.setText("Pooduto");
 
@@ -92,19 +98,12 @@ public class BuscarGUI extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Id", "Descrição", "Unidade", "Ativo"
+                "Id", "Descrição", "Unidade"
             }
         ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
-            };
             boolean[] canEdit = new boolean [] {
-                false, false, false, true
+                false, false, false
             };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -120,7 +119,6 @@ public class BuscarGUI extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(0).setResizable(false);
             jTable1.getColumnModel().getColumn(1).setResizable(false);
             jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
         }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -189,18 +187,24 @@ public class BuscarGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-
+        String txtCodigo;
         int row = jTable1.rowAtPoint(evt.getPoint());
         int col = jTable1.columnAtPoint(evt.getPoint());
         if (row >= 0) {
-
-           
+            encontrarMovimentacaoProdutoPorId((int) jTable1.getValueAt(row, 0));
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        
+        carregarTabela();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void txtNomeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomeKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+// Ação a ser executada quando a tecla Enter é pressionada
+            carregarTabela();
+        }
+    }//GEN-LAST:event_txtNomeKeyPressed
 
     /**
      * @param args the command line arguments
@@ -252,18 +256,16 @@ public class BuscarGUI extends javax.swing.JFrame {
         });
     }
 
-    
-
     public void carregarTabela() {
 
         try (Connection conexao = ConexaoMySQL.obterConexao()) {
             ProdutoService produtoService = new ProdutoService(conexao);
 
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel(); // jTable1 é o nome da sua tabela
-            List<Produto> produtos = produtoService.listarProdutos(); // Chame o seu serviço para obter os dados
+            List<Produto> produtos = produtoService.encontrarProdutosPorNome(txtNome.getText()); // Chame o seu serviço para obter os dados
             model.setRowCount(0); // Remove todas as linhas existentes do modelo de tabela
             for (Produto produto : produtos) {
-                model.addRow(new Object[]{produto.getCodigo(), produto.getNome(), produto.getUnidade().getSimbolo(), true});
+                model.addRow(new Object[]{produto.getCodigo(), produto.getNome(), produto.getUnidade().getSimbolo()});
             }
             jTable1.getTableHeader().setReorderingAllowed(false);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -273,7 +275,54 @@ public class BuscarGUI extends javax.swing.JFrame {
         }
     }
 
-   
+    public void encontrarMovimentacaoProdutoPorId(int id) {
+        try (Connection conexao = ConexaoMySQL.obterConexao()) {
+            MovimentacaoService movimentacaoService = new MovimentacaoService(conexao);
+            Movimentacao movimentacao = movimentacaoService.encontrarMovimentacaoProdutoPorCodigo(id);
+            carregarMovimetacoesPorProduto(id);
+            if (movimentacao != null) {
+                carregarMovimetacoesPorProduto(id);
+
+                JOptionPane.showMessageDialog(
+                        null, // Componente pai (use null para nenhum componente pai)
+                        "ID: " + movimentacao.getProduto().getCodigo()
+                        + "\nProduto: " + movimentacao.getProduto().getNome()
+                        + "\nUnidade: " + movimentacao.getProduto().getUnidade().getSimbolo()
+                        + "\nSaldo: " + saldo
+                        + " Entrada: " + qEntrada
+                        + " Saida: " + qSaida,// Mensagem
+                        "Produto: " + movimentacao.getProduto().getNome(), // Título
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("ERRO: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    public void carregarMovimetacoesPorProduto(int id) {
+        saldo = 0;
+        qEntrada = 0;
+        qSaida = 0;
+        try (Connection conexao = ConexaoMySQL.obterConexao()) {
+            MovimentacaoService movimentacaoService = new MovimentacaoService(conexao);
+            for (Movimentacao movimentacao : movimentacaoService.listarMovimentacoesPorProdutos(id)) {
+                if (movimentacao.getTipoMovimento() == TipoMovimento.ENTRADA) {
+                    qEntrada = qEntrada + movimentacao.getQuantidade();
+                }
+                if (movimentacao.getTipoMovimento() == TipoMovimento.SAIDA) {
+                    qSaida = qSaida + movimentacao.getQuantidade();
+                }
+                saldo = qEntrada - qSaida;
+
+            }
+        } catch (SQLException e) {
+            System.out.println("ERRO: " + e);
+            e.printStackTrace();
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton3;

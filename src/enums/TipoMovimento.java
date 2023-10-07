@@ -12,6 +12,8 @@ public enum TipoMovimento {
     ENTRADA(1, "Entrada"),
     SAIDA(2, "Saida");
 
+    
+
     private final int id;
     private final String tipo;
 
