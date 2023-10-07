@@ -308,18 +308,23 @@ public class MovimentoGUI extends javax.swing.JFrame {
         carregarTabela();
         limparProduto();
         mostraCampos();
-        
+
         carregarTipo();
 
         carregarProdutos(cbProduto.getSelectedItem().toString());
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            adicionarProduto();
-        } catch (SQLException ex) {
-            Logger.getLogger(UnidadeGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            adicionarProduto();
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UnidadeGUI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        System.out.println("Tipo: " + cbTipo.getSelectedItem());
+        System.out.println("Produto: " + cbProduto.getSelectedItem());
+        System.out.println("Quantidade: " + spQuantidade.getValue());
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
@@ -426,7 +431,7 @@ public class MovimentoGUI extends javax.swing.JFrame {
 
     public void adicionarProduto() throws SQLException {
         int id = Integer.parseInt(txtCodigo.getText());
-        String nome ="";
+        String nome = "";
 //                txtNome.getText().toUpperCase();
         Unidade unidade = (Unidade) cbProduto.getSelectedItem();
         if (nome.length() > 1) {
@@ -527,18 +532,14 @@ public class MovimentoGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    
-    
-    
+
     public void carregarTipo() {
-         
-           // Adicione os valores do enum ao modelo de combobox
+
+        // Adicione os valores do enum ao modelo de combobox
         Arrays.stream(TipoMovimento.values()).forEach(cbTipo::addItem);
-        
+
     }
-    
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
